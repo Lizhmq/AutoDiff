@@ -5,9 +5,9 @@ import math
 
 class add(Operator):
     count = 0
-    def __init__(self, a, b, name=None):
+    def __init__(self, inputs, name=None):
         super().__init__(name)
-        self.inputs = [a, b]
+        self.inputs = inputs
         self.name = f'add/{add.count}' if name is None else name
         add.count += 1
     
@@ -21,9 +21,9 @@ class add(Operator):
 
 class minus(Operator):
     count = 0
-    def __init__(self, a, b, name=None):
+    def __init__(self, inputs, name=None):
         super().__init__(name)
-        self.inputs = [a, b]
+        self.inputs = inputs
         self.name = f'minus/{minus.count}' if name is None else name
         minus.count += 1
     
@@ -37,9 +37,9 @@ class minus(Operator):
 
 class multiply(Operator):
     count = 0
-    def __init__(self, a, b, name=None):
+    def __init__(self, inputs, name=None):
         super().__init__(name)
-        self.inputs = [a, b]
+        self.inputs = inputs
         self.name = f'mul/{multiply.count}' if name is None else name
         multiply.count += 1
     
@@ -54,9 +54,9 @@ class multiply(Operator):
 
 class divide(Operator):
     count = 0
-    def __init__(self, a, b, name=None):
+    def __init__(self, inputs, name=None):
         super().__init__(name)
-        self.inputs = [a, b]
+        self.inputs = inputs
         self.name = f'div/{divide.count}' if name is None else name
         divide.count += 1
     
@@ -70,9 +70,9 @@ class divide(Operator):
 
 class cos(Operator):
     count = 0
-    def __init__(self, a, name=None):
-        super.__init__(name)
-        self.inputs = [a]
+    def __init__(self, inputs, name=None):
+        super().__init__(name)
+        self.inputs = inputs
         self.name = f'cos/{cos.count}' if name is None else name
         cos.count += 1
     
@@ -87,9 +87,9 @@ class cos(Operator):
 
 class sin(Operator):
     count = 0
-    def __init__(self, a, name=None):
-        super.__init__(name)
-        self.inputs = [a]
+    def __init__(self, inputs, name=None):
+        super().__init__(name)
+        self.inputs = inputs
         self.name = f'sin/{sin.count}' if name is None else name
         sin.count += 1
     
@@ -104,9 +104,9 @@ class sin(Operator):
 
 class tan(Operator):
     count = 0
-    def __init__(self, a, name=None):
-        super.__init__(name)
-        self.inputs = [a]
+    def __init__(self, inputs, name=None):
+        super().__init__(name)
+        self.inputs = inputs
         self.name = f'tan/{tan.count}' if name is None else name
         tan.count += 1
     
@@ -121,9 +121,9 @@ class tan(Operator):
 
 class exp(Operator):
     count = 0
-    def __init__(self, a, name=None):
-        super.__init__(name)
-        self.inputs = [a]
+    def __init__(self, inputs, name=None):
+        super().__init__(name)
+        self.inputs = inputs
         self.name = f'exp/{exp.count}' if name is None else name
         exp.count += 1
     
@@ -138,9 +138,9 @@ class exp(Operator):
 
 class log(Operator):
     count = 0
-    def __init__(self, a, name=None):
-        super.__init__(name)
-        self.inputs = [a]
+    def __init__(self, inputs, name=None):
+        super().__init__(name)
+        self.inputs = inputs
         self.name = f'log/{log.count}' if name is None else name
         log.count += 1
     

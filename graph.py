@@ -2,6 +2,7 @@ import numpy as np
 import math
 from node import *
 from op import *
+import json
 
 class Graph():
     """ Computational graph class. 
@@ -18,6 +19,7 @@ class Graph():
         self.variables = set()
         self.placeholders = set()
         self.ordering = None
+        self.innodes = None
         self.outnode = None
         global _g
         _g = self
@@ -92,11 +94,49 @@ class Graph():
         return
 
 
-with Graph() as g:
-    x = Variable(1.3)
-    y = Variable(0.9)
-    z = x * y + 5
+def read_graph(path, _g):
+    with open(path, "r") as f:
+        dic = json.load(f)
+    nodes = dic["Nodes"]
+    inputs = dic["Inputs"]
+    outputs = dic["Output"]
+    name_dic = {}
+    for node in nodes:
+        if node["type"] == "PlaceHolder":
+            newnode = None
+            pass
+        elif node["type"] == "Constant":
+            newnode = Constant(node["value"], node["name"])
+        elif node["type"] == "Variable":
+            newnode = Variable(node["value"], node["name"])
+        else:
+            typ = node["type"]
+            operator_dic = {
+                "add": add,
+                "sin": sin,
+                "cos": cos,
+                "tan": tan,
+                "log": log,
+                "exp": exp,
+                "multiply": multiply
+            }
+            assert(typ in operator_dic.keys())
+            cls = operator_dic[typ]
+            inputs = [name_dic[na] for na in node["inputs"]]
+            newnode = cls(inputs=inputs, name=node["name"])
+        name_dic[node["name"]] = newnode
+    _g.innodes = [name_dic[k] for k in dic["Inputs"]]
+    _g.outnode = name_dic[dic["Output"]]
+    return name_dic
 
-    print(g.variables)
-    print(g.constants)
-    print(g.operators)
+with Graph() as g:
+    file = "func2.json"
+    name_dic = read_graph(file, g)
+    # print(g.variables)
+    # print(g.constants)
+    # print(g.operators)
+    feed_dict = {"x1": 0, "x2": 0, "x3": 1}
+    for name in feed_dict:
+        name_dic[name].value = feed_dict[name]
+    g.forward_pass()
+    print(g.outnode.value)
