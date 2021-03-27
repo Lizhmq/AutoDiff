@@ -19,7 +19,7 @@ class Graph():
         self.variables = set()
         self.placeholders = set()
         self.ordering = None
-        self.innodes = None
+        self.innodes = []
         self.outnode = None
         global _g
         _g = self
@@ -85,12 +85,16 @@ class Graph():
             if isinstance(node, Operator):
                 inputs = node.inputs
                 grads = node.backward(node.gradient)
+                if not isinstance(grads, tuple):
+                    grads = [grads]
+                # print(inputs)
+                # print(grads)
                 for inp, grad in zip(inputs, grads):
                     if inp not in vis:
-                        inp.gradients = grad
+                        inp.gradient = grad
                         vis.add(inp)
                     else:
-                        inp.gradients += grad
+                        inp.gradient += grad
         return
 
 
@@ -129,14 +133,51 @@ def read_graph(path, _g):
     _g.outnode = name_dic[dic["Output"]]
     return name_dic
 
-with Graph() as g:
-    file = "func2.json"
-    name_dic = read_graph(file, g)
-    # print(g.variables)
-    # print(g.constants)
-    # print(g.operators)
-    feed_dict = {"x1": 0, "x2": 0, "x3": 1}
-    for name in feed_dict:
-        name_dic[name].value = feed_dict[name]
-    g.forward_pass()
-    print(g.outnode.value)
+
+def validate_grad():
+    with Graph() as g:
+        file = "AutoDiff/func2.json"
+        global name_dic
+        name_dic = read_graph(file, g)
+        # print(g.variables)
+        # print(g.constants)
+        # print(g.operators)
+
+        # input: x
+        feed_dict = {"x1": 0, "x2": 0, "x3": 1}
+        for name in feed_dict:
+            name_dic[name].value = feed_dict[name]
+        g.forward_pass()
+        y1 = g.outnode.value
+        g.backward_pass()
+        gradients = [name_dic[na].gradient for na in feed_dict]
+        
+        direction = {"x1": 1, "x2": 2, "x3": 3}
+        vec = [direction[na] for na in feed_dict]
+        print(f"<\\Nabla f(x), v>: {np.sum(np.array(gradients) * np.array(vec))}")
+
+
+        # input2: x + tv
+        t = 0.0001
+        for name in feed_dict:
+            name_dic[name].value += t * direction[name]
+        g.forward_pass()
+        y2 = g.outnode.value
+        print(f"[f(x+tv) - f(x)] / t: {(y2 - y1) / t}")
+
+
+
+
+if __name__ == "__main__":
+    validate_grad()
+    # with Graph() as g:
+    #     file = "func2.json"
+    #     name_dic = read_graph(file, g)
+    #     # print(g.variables)
+    #     # print(g.constants)
+    #     # print(g.operators)
+    #     feed_dict = {"x1": 0, "x2": 0, "x3": 1}
+    #     for name in feed_dict:
+    #         name_dic[name].value = feed_dict[name]
+    #     g.forward_pass()
+    #     print(g.outnode.value)
