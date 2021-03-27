@@ -73,7 +73,7 @@ class cos(Operator):
     def __init__(self, a, name=None):
         super.__init__(name)
         self.inputs = [a]
-        self.name = f'cos/{divide.count}' if name is None else name
+        self.name = f'cos/{cos.count}' if name is None else name
         cos.count += 1
     
     def forward(self):
@@ -90,7 +90,7 @@ class sin(Operator):
     def __init__(self, a, name=None):
         super.__init__(name)
         self.inputs = [a]
-        self.name = f'sin/{divide.count}' if name is None else name
+        self.name = f'sin/{sin.count}' if name is None else name
         sin.count += 1
     
     def forward(self):
@@ -100,7 +100,59 @@ class sin(Operator):
     def backward(self, dout):
         a = self.inputs[0]
         return math.cos(a.value) * dout
-	
+
+
+class tan(Operator):
+    count = 0
+    def __init__(self, a, name=None):
+        super.__init__(name)
+        self.inputs = [a]
+        self.name = f'tan/{tan.count}' if name is None else name
+        tan.count += 1
+    
+    def forward(self):
+        a = self.inputs[0]
+        return math.sin(a.value) / math.cos(a.value)
+
+    def backward(self, dout):
+        a = self.inputs[0]
+        return dout / math.pow(math.cos(a.value), 2)
+
+
+class exp(Operator):
+    count = 0
+    def __init__(self, a, name=None):
+        super.__init__(name)
+        self.inputs = [a]
+        self.name = f'exp/{exp.count}' if name is None else name
+        exp.count += 1
+    
+    def forward(self):
+        a = self.inputs[0]
+        return math.exp(a.value)
+
+    def backward(self, dout):
+        a = self.inputs[0]
+        return dout * math.exp(a.value)
+
+
+class log(Operator):
+    count = 0
+    def __init__(self, a, name=None):
+        super.__init__(name)
+        self.inputs = [a]
+        self.name = f'log/{log.count}' if name is None else name
+        log.count += 1
+    
+    def forward(self):
+        a = self.inputs[0]
+        return math.log(a.value)
+
+    def backward(self, dout):
+        a = self.inputs[0]
+        return dout / a.value
+
+
 def node_wrapper(func, self, other):
     """ Check to make sure that the two things we're comparing are
     actually graph nodes. Also, if we use a constant, automatically

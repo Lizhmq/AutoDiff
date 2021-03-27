@@ -56,4 +56,13 @@ class Operator(Node):
         return f"Operator: name:{self.name}"
 
 class PlaceHolder(Node):
-    pass
+    count = 0
+    def __init__(self, name, dtype=float):
+        Node._g.placeholders.add(self)
+        self.value = None
+        self.gradient = None
+        self.name = f"Plc/{PlaceHolder.count}" if name is None else name
+        PlaceHolder.count += 1
+    
+    def __repr__(self):
+        return f"Placeholder: name:{self.name}, value:{self.value}"

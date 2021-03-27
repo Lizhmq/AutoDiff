@@ -17,6 +17,8 @@ class Graph():
         self.constants = set()
         self.variables = set()
         self.placeholders = set()
+        self.ordering = None
+        self.outnode = None
         global _g
         _g = self
         Node._g = _g
@@ -42,7 +44,52 @@ class Graph():
     def __exit__(self, exc_type, exc_value, trace):
         self.reset_session()
 
-    def 
+    def topo_sort(self, head_node=None):
+        vis = set()
+        curordering = []
+        def _dfs(node):
+            if node in vis:
+                return
+            vis.add(node)
+            if isinstance(node, Operator):
+                for input_node in node.inputs:
+                    _dfs(input_node)
+            curordering.append(node)
+        
+        if head_node is None:
+            for node in self.operators:
+                _dfs(node)
+        else:
+            _dfs(head_node)
+        self.ordering = curordering
+        return
+
+    def forward_pass(self, feed_dict={}):
+        if self.ordering is None:
+            self.topo_sort(head_node=self.outnode)
+        for node in self.ordering:
+            if isinstance(node, PlaceHolder):
+                node.value = feed_dict[node.name]
+            elif isinstance(node, Operator):
+                node.value = node.forward()
+        if self.outnode is None:
+            self.outnode = self.ordering[-1]
+        return self.outnode.value
+    
+    def backward_pass(self):
+        vis = set()
+        self.outnode.gradient = 1
+        for node in reversed(self.ordering):
+            if isinstance(node, Operator):
+                inputs = node.inputs
+                grads = node.backward(node.gradient)
+                for inp, grad in zip(inputs, grads):
+                    if inp not in vis:
+                        inp.gradients = grad
+                        vis.add(inp)
+                    else:
+                        inp.gradients += grad
+        return
 
 
 with Graph() as g:
