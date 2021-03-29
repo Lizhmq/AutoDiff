@@ -55,6 +55,7 @@ class Operator(Node):
     def __repr__(self):
         return f"Operator: name:{self.name}"
 
+
 class PlaceHolder(Node):
     count = 0
     def __init__(self, name, dtype=float):
