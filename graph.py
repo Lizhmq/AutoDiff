@@ -6,6 +6,7 @@ from node import *
 from op import *
 from tensorop import *
 import json
+from visual import make_graph
 
 class Graph():
     """ Computational graph class. 
@@ -178,7 +179,7 @@ def testconv():
 
 def validate_grad():
     with Graph() as g:
-        file = "AutoDiff/func2.json"
+        file = "func2.json"
         global name_dic
         name_dic = read_graph(file, g)
 
@@ -187,6 +188,9 @@ def validate_grad():
         for name in feed_dict:
             name_dic[name].value = feed_dict[name]
         g.forward_pass()
+        graph = make_graph(g.ordering)
+        graph.render("graph1")
+
         y1 = g.outnode.value
         g.backward_pass()
         gradients = [name_dic[na].gradient for na in feed_dict]
@@ -207,10 +211,14 @@ def validate_grad():
 
 def validate_grad2():
     with Graph() as g:
-        file = "AutoDiff/func1.json"
+        file = "func1.json"
         global name_dic
         name_dic = read_graph(file, g)
+
         g.forward_pass()
+        graph = make_graph(g.ordering)
+        graph.render("graph2")
+
         y1 = g.outnode.value
         g.backward_pass()
         gradients = name_dic["x"].gradient
